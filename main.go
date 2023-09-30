@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -42,11 +41,18 @@ func execCmd(cmd string) error {
 	switch parts[0] {
 	case "cd":
 		var err error
+		var dir string
 		if len(parts) < 2 {
-			return errors.New("no path provided")
+			dir = os.Getenv("$HOME")
+		} else {
+			dir = parts[1]
 		}
-		if err = os.Chdir(parts[1]); err == nil {
-			workingDir = path.Base(parts[1])
+		if err = os.Chdir(dir); err == nil {
+			curDir, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			workingDir = path.Base(curDir)
 		}
 		return err
 
